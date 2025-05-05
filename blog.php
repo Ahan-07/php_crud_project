@@ -1,17 +1,41 @@
+<?php
+session_start();
+include 'db.php';
+
+// Search
+$search = isset($_GET['search']) ? mysqli_real_escape_string($conn, $_GET['search']) : '';
+
+// Pagination
+$limit = 6;
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$offset = ($page - 1) * $limit;
+
+// Count posts
+$countSql = "SELECT COUNT(*) AS total FROM posts WHERE title LIKE '%$search%' OR content LIKE '%$search%'";
+$countResult = mysqli_query($conn, $countSql);
+$totalPosts = mysqli_fetch_assoc($countResult)['total'];
+$totalPages = ceil($totalPosts / $limit);
+
+// Fetch posts
+$sql = "SELECT * FROM posts 
+        WHERE title LIKE '%$search%' OR content LIKE '%$search%' 
+        ORDER BY created_at DESC 
+        LIMIT $limit OFFSET $offset";
+$result = mysqli_query($conn, $sql);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BlogVerse</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-          body ,html{
-            background-color:rgb(202, 222, 254);
+        body, html {
+            background-color: rgb(202, 222, 254);
             height: 100%;
             font-family: 'Segoe UI', sans-serif;
         }
-       
         .blog-card {
             border: none;
             border-radius: 1rem;
@@ -36,80 +60,67 @@
         .blog-btn:hover {
             background-color: #5848e5;
         }
-        .hero {
-            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.7));
-            height: 100%;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            text-align: center;
-            padding: 0 10px;
-        }
-        .hero h1 {
-            font-size: 3.5rem;
-            font-weight: bold;
-        }
-        .hero p {
-            font-size: 1.3rem;
-            margin-top: 1rem;
-            margin-bottom: 2rem;
-        }
-        .btn-custom {
-            background-color: #6c63ff;
-            color: #fff;
-            padding: 0.75rem 2rem;
-            margin: 0 0.5rem;
-            font-size: 1.1rem;
-            border: none;
-            border-radius: 0.5rem;
-            transition: background-color 0.3s ease;
-        }
-        .btn-custom:hover {
-            background-color: #5848e5;
-        }
     </style>
 </head>
 <body>
-<?php
-    session_start();
-    include 'db.php';
+<div class="container py-4">
 
-    echo '<div class="mb-4 mt-2 text-end">';
-    if (isset($_SESSION['user_id'])) {
-        echo "<a class='btn btn-primary me-2' href='create_post.php'>Create New Post</a>";
-        echo "<a class='btn btn-outline-danger' href='logout.php'>Logout</a>";
-     }
-      else {
-        // echo "<a class='btn btn-success me-2' href='login.php'>Login</a>";
-        // echo "<a class='btn btn-warning' href='register.php'>Register</a>";
-        include 'index.php';
-    }
-    echo '</div>';
+    <!-- Top Buttons -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="fw-bold">BlogVerse</h2>
+        <div>
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <a class="btn btn-primary me-2" href="create_post.php">Create Post</a>
+                <a class="btn btn-outline-danger" href="logout.php">Logout</a>
+            <?php else: ?>
+                <a class="btn btn-success me-2" href="login.php">Login</a>
+                <a class="btn btn-warning" href="register.php">Register</a>
+            <?php endif; ?>
+        </div>
+    </div>
 
-    $sql = "SELECT * FROM posts ORDER BY created_at DESC";
-    $result = mysqli_query($conn, $sql);
-if( isset( $_SESSION['user_id']) ){
-    echo '<div class="row g-4">';
-    while ($row = mysqli_fetch_assoc($result)) {
-        echo '<div class="col-md-6 col-lg-4">';
-        echo '<div class="card blog-card">';
-        echo '<img src="https://source.unsplash.com/600x400/?nature,blog" class="card-img-top blog-img" alt="Post Image">';
-        echo '<div class="card-body">';
-        echo '<h5 class="card-title blog-title">' . htmlspecialchars($row['title']) . '</h5>';
-        echo '<p class="card-text blog-text">' . substr(strip_tags($row['content']), 0, 300) . '...</p>';
-        echo '<a href="view_post.php?id=' . $row['id'] . '" class="btn blog-btn btn-sm">Continue Reading</a>';
-        if (isset($_SESSION['user_id'])) {
-            echo '<a href="edit_post.php?id=' . $row['id'] . '" class="btn btn-outline-info btn-sm ms-2">Edit</a>';
-            echo '<a href="delete_post.php?id=' . $row['id'] . '" class="btn btn-outline-danger btn-sm ms-2">Delete</a>';
-        }
-        echo '</div>';
-        echo '</div>';
-        echo '</div>';
-    }
-    echo '</div>';
-}
-    ?>
+    <!-- Search Form -->
+    <form method="GET" class="mb-4 d-flex">
+        <input type="text" name="search" class="form-control me-2" placeholder="Search by title or content..." value="<?= htmlspecialchars($search) ?>">
+        <button type="submit" class="btn btn-primary ">Search</button>
+    </form>
+
+    <!-- Post Cards -->
+    <?php if (isset($_SESSION['user_id'])): ?>
+        <?php if (mysqli_num_rows($result) > 0): ?>
+            <div class="row g-4">
+                <?php while ($row = mysqli_fetch_assoc($result)): ?>
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card blog-card">
+                            <img src="https://source.unsplash.com/600x400/?blog,post,<?= rand(1,100) ?>" class="card-img-top blog-img" alt="Post Image">
+                            <div class="card-body">
+                                <h5 class="card-title blog-title"><?= htmlspecialchars($row['title']) ?></h5>
+                                <p class="card-text blog-text"><?= substr(strip_tags($row['content']), 0, 150) ?>...</p>
+                                <a href="view_post.php?id=<?= $row['id'] ?>" class="btn blog-btn btn-sm">Read More</a>
+                                <a href="edit_post.php?id=<?= $row['id'] ?>" class="btn btn-outline-info btn-sm ms-2">Edit</a>
+                                <a href="delete_post.php?id=<?= $row['id'] ?>" class="btn btn-outline-danger btn-sm ms-2">Delete</a>
+                            </div>
+                        </div>
+                    </div>
+                <?php endwhile; ?>
+            </div>
+
+            <!-- Pagination -->
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                        <li class="page-item <?= ($i == $page) ? 'active' : '' ?>">
+                            <a class="page-link" href="?search=<?= urlencode($search) ?>&page=<?= $i ?>"><?= $i ?></a>
+                        </li>
+                    <?php endfor; ?>
+                </ul>
+            </nav>
+        <?php else: ?>
+            <div class="alert alert-warning">No posts found for "<?= htmlspecialchars($search) ?>".</div>
+        <?php endif; ?>
+    <?php else: ?>
+        <div class="alert alert-info text-center">Please login to view posts.</div>
+    <?php endif; ?>
+</div>
 </body>
 </html>
