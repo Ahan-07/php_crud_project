@@ -2,6 +2,28 @@
 
 This is a simple PHP project set up for internship purposes at ApexPlanet Software Pvt. Ltd.
 
+# BlogVerse – PHP Blog App with Search, Pagination, and Responsive UI
+
+![PHP](https://img.shields.io/badge/PHP-7.4-blue)
+![MySQL](https://img.shields.io/badge/MySQL-5.7-orange)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-purple)
+![License](https://img.shields.io/badge/license-MIT-green)
+
+BlogVerse is a clean and minimal blogging platform built with **PHP**, **MySQL**, and **Bootstrap 5**.  
+It allows users to create, view, search, and manage blog posts with pagination and a responsive interface.
+
+---
+
+## ✨ Features
+
+- **User Authentication** (Login/Register)
+- **Create, Edit & Delete Posts**
+- **Search Functionality** (By title or content)
+- **Pagination** (Display limited posts per page)
+- **Responsive UI** with Bootstrap
+- **Security**: Basic session management and input sanitization
+
+
 ## Project Setup
 - Local server: XAMPP
 - Language: PHP
