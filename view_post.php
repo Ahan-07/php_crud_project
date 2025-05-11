@@ -58,6 +58,10 @@ $post = mysqli_fetch_assoc($result);
         .btn-back:hover {
             background-color: #5848e5;
         }
+        .post-image {
+            max-height: 500px;
+            object-fit: cover;
+        }
     </style>
 </head>
 <body>
@@ -71,6 +75,11 @@ $post = mysqli_fetch_assoc($result);
         <h1 class="post-title"><?= htmlspecialchars($post['title']) ?></h1>
         <div class="post-meta">Posted on <?= date('F j, Y, g:i a', strtotime($post['created_at'])) ?></div>
         <hr>
+        <?php if (!empty($post['image']) && file_exists('uploads/' . $post['image'])): ?>
+            <div class="text-center mb-4">
+                <img src="uploads/<?= htmlspecialchars($post['image']) ?>" class="img-fluid rounded shadow post-image" alt="Post Image">
+            </div>
+        <?php endif; ?>
         <div class="post-content"><?= nl2br(htmlspecialchars($post['content'])) ?></div>
     </div>
 </div>
