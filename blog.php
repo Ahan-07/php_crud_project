@@ -99,7 +99,10 @@ $result = mysqli_query($conn, $sql);
         color: #f8f8f8;
         border-color: #444;
     }
-    .dark-mode .blog-title ,.blog-text {
+   .dark-mode .blog-text{
+    color: #f0f0f0;
+   }
+    .dark-mode .blog-title {
         color:rgb(232, 239, 247);}
     .dark-mode .pagination .page-link {
         background-color: #2a2a2a;
@@ -159,10 +162,15 @@ $result = mysqli_query($conn, $sql);
           <?php while ($row = mysqli_fetch_assoc($result)): ?>
             <div class="col-md-6 col-lg-4">
               <div class="card blog-card">
-                <img src="https://source.unsplash.com/600x400/?blog,post,<?= rand(1,100) ?>" class="card-img-top blog-img" alt="Post Image">
+              <?php if (!empty($row['image']) && file_exists('uploads/' . $row['image'])): ?>
+  <img src="uploads/<?= htmlspecialchars($row['image']) ?>" class="card-img-top blog-img" alt="Post Image">
+<?php else: ?>
+  <img src="https://source.unsplash.com/600x400/?blog,post,<?= rand(1,100) ?>" class="card-img-top blog-img" alt="Default Blog Image">
+<?php endif; ?>
+
                 <div class="card-body">
                   <h5 class="card-title blog-title"><?= htmlspecialchars($row['title']) ?></h5>
-                  <p class="card-text blog-text"><?= substr(strip_tags($row['content']), 0, 150) ?>...</p>
+                  <p class="card-text blog-text"><?= substr(strip_tags($row['content']), 0, 30) ?>...</p>
                   <a href="view_post.php?id=<?= $row['id'] ?>" class="btn blog-btn btn-sm">Read More</a>
                   <?php if ($_SESSION['user_role'] === 'admin'||$_SESSION['user_role'] === 'editor'): ?>
                   <a href="edit_post.php?id=<?= $row['id'] ?>" class="btn btn-outline-info btn-sm ms-2">Edit</a>
