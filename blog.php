@@ -76,8 +76,13 @@ $result = mysqli_query($conn, $sql);
                 <a class="btn btn-success me-2" href="login.php">Login</a>
                 <a class="btn btn-warning" href="register.php">Register</a>
             <?php endif; ?>
+            <?php if ($_SESSION['user_role'] === 'admin'): ?>
+  <a href="admin.php" class="btn btn-dark me-2">Admin Panel</a>
+<?php endif; ?>
+
         </div>
     </div>
+    
 
     <!-- Search Form -->
     <form method="GET" class="mb-4 d-flex">
@@ -97,8 +102,10 @@ $result = mysqli_query($conn, $sql);
                                 <h5 class="card-title blog-title"><?= htmlspecialchars($row['title']) ?></h5>
                                 <p class="card-text blog-text"><?= substr(strip_tags($row['content']), 0, 150) ?>...</p>
                                 <a href="view_post.php?id=<?= $row['id'] ?>" class="btn blog-btn btn-sm">Read More</a>
+                                <?php if ($_SESSION['user_role'] === 'admin'||$_SESSION['user_role'] === 'editor'): ?>
                                 <a href="edit_post.php?id=<?= $row['id'] ?>" class="btn btn-outline-info btn-sm ms-2">Edit</a>
                                 <a href="delete_post.php?id=<?= $row['id'] ?>" class="btn btn-outline-danger btn-sm ms-2">Delete</a>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
