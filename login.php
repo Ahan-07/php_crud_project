@@ -2,70 +2,78 @@
 session_start();
 include 'db.php';
 
+$error = '';
+
 if (isset($_POST['login'])) {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
+  $username = trim($_POST['username']);
+  $password = $_POST['password'];
 
-    $result = mysqli_query($conn, "SELECT * FROM users WHERE username='$username'");
-    $row = mysqli_fetch_assoc($result);
+  // Prepare statement
+  $stmt = $conn->prepare("SELECT * FROM users WHERE username = ?");
+  $stmt->bind_param("s", $username);
+  $stmt->execute();
 
-    if ($row && password_verify($password, $row['password'])) {
-        $_SESSION['user_id'] = $row['id'];
-        header('Location: blog.php');
-        exit;
-    } else {
-        $error = "Invalid login credentials.";
-    }
+  $result = $stmt->get_result();
+  $user = $result->fetch_assoc();
+
+  // Verify password
+  if ($user && password_verify($password, $user['password'])) {
+    $_SESSION['user_id'] = $user['id'];
+    $_SESSION['username'] = $user['username'];
+    $_SESSION['user_role'] = $user['role'];
+
+    // Optional: redirect based on role
+    header("Location: blog.php");
+    exit;
+  } else {
+    $error = "Invalid username or password.";
+  }
+
+  $stmt->close();
 }
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login</title>
+  <title>Login - BlogVerse</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    .password-toggle {
-      cursor: pointer;
-    }
-  </style>
 </head>
-<body class="bg-dark">
+
+<body class="bg-light">
+
+  <!-- <div class="container mt-5" style="max-width: 500px;"> -->
   <div class="d-flex justify-content-center align-items-center vh-100">
     <div class="card shadow-lg" style="width: 350px;">
       <div class="card-body">
-        <h3 class="card-title text-center mb-4">Sign In</h3>
+        <h2 class="mb-4 text-center">Login</h2>
 
-        <?php if (isset($error)) : ?>
-          <div class="alert alert-danger" role="alert">
-            <?= $error ?>
-          </div>
+        <?php if ($error): ?>
+          <div class="alert alert-danger"><?= $error ?></div>
         <?php endif; ?>
 
-        <form method="POST" id="loginForm">
+        <form method="POST" novalidate>
           <div class="mb-3">
-            <label for="username" class="form-label">Username</label>
-            <input type="text" class="form-control" id="username" name="username" autocomplete="username" required autofocus>
+            <label class="form-label">Username</label>
+            <input type="text" name="username" class="form-control" required>
           </div>
 
           <div class="mb-3 position-relative">
             <label for="password" class="form-label">Password</label>
             <div class="input-group">
-              <input type="password" class="form-control" id="password" name="password" autocomplete="current-password" required>
-              <span class="input-group-text password-toggle" id="togglePassword">
-                <i><img src="eye-fill.svg" alt="Show/Hide" /></i>
-              </span>
+              <input type="password" class="form-control" id="password" name="password" required>
+              <span class="input-group-text password-toggle" id="togglePassword"><i>
+                  <img src="eye-fill.svg" alt="" srcset="">
+                </i></span>
             </div>
-          </div>
 
-          <button type="submit" name="login" class="btn btn-primary w-100" id="submitBtn">Login</button>
+            <button type="submit" name="login" class="btn mt-1 btn-primary w-100">Login</button>
         </form>
 
         <div class="text-center mt-3">
-          <a href="#">Forgot Password?</a> | <a href="register.php">Sign Up</a>
+          Don’t have an account? <a href="register.php">Register</a>
         </div>
       </div>
     </div>
@@ -84,4 +92,5 @@ if (isset($_POST['login'])) {
     });
   </script>
 </body>
+
 </html>
