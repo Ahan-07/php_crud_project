@@ -14,7 +14,7 @@ if (isset($_POST['change_role'])) {
         $stmt->bind_param("si", $new_role, $uid);
         $stmt->execute();
         $stmt->close();
-        echo "<script>location.reload();</script>"; // refresh to reflect change
+        // echo "<script>location.reload();</script>"; // refresh to reflect change
     }
 }
 
