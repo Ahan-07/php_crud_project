@@ -73,17 +73,18 @@ A secure, responsive blogging platform built with **PHP**, **MySQLi**, and **Boo
 ---
 
 ## 📁 Folder Structure
+├── uploads/           # where images go (empty or sample)
+├── db.php
+├── login.php
+├── register.php
+├── blog.php
+├── create_post.php
+├── edit_post.php
+├── delete_post.php
+├── view_post.php
+├── admin_panel.php
+└── README.md
 
- 📁 uploads/
-┣ 📄 db.php
-┣ 📄 login.php
-┣ 📄 register.php
-┣ 📄 blog.php
-┣ 📄 create_post.php
-┣ 📄 edit_post.php
-┣ 📄 delete_post.php
-┣ 📄 view_post.php
-┣ 📄 admin_panel.php
 
 ## Project Setup
 - Local server: XAMPP
@@ -106,14 +107,6 @@ A secure, responsive blogging platform built with **PHP**, **MySQLi**, and **Boo
 3. Move the project folder to the `htdocs` directory (XAMPP) or `www` directory (WAMP).
 4. Open **phpMyAdmin** and run the following SQL script to create the database:
 
-
-## Initial Structure
-- `index.php` — Main entry point
-- `README.md` — Project description
-
-## Author
-- Name: Zakir Hussain
-- Internship Program: Web Development (PHP & MySQL)
 
 ## Initial Structure
 - `index.php` — Main entry point
